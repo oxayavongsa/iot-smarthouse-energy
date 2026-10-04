@@ -1,129 +1,96 @@
-# Smart Home Energy Predictions: IoT and Machine Learning
-### AAI-530 IoT and Machine Learning Final Project
-University of San Diego, School of Engineering - Masters of Applied Artificial Intelligence
+<div align="center">
 
-## Project Overview
-This project leverages IoT sensor data to develop predictive models and classifications for indoor environmental conditions. Using deep learning techniques, including Long Short-Term Memory (LSTM) networks, Convolutional Neural Networks (CNN), and Seasonal Autoregressive Integrated Moving Average with Exogenous Variables (SARIMAX), the study explores temperature forecasting and anomaly detection in smart home settings.
+# 🏠 Smart Home Energy Predictions: IoT + Machine Learning
 
-## Project Components
-### Final Paper
+**Forecasting indoor temperature and classifying comfort conditions from multi-sensor smart-home IoT data with LSTM, CNN, and SARIMAX.**
 
-The technical paper provides an in-depth analysis of the project, detailing data preprocessing, exploratory data analysis (EDA), model selection, and performance evaluation. 
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15-FF6F00?logo=tensorflow&logoColor=white)
+![Keras](https://img.shields.io/badge/Keras-D00000?logo=keras&logoColor=white)
+![statsmodels](https://img.shields.io/badge/statsmodels-SARIMAX-4051B5)
+![Tableau](https://img.shields.io/badge/Tableau-Dashboard-E97627?logo=tableau&logoColor=white)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue)
+![Course](https://img.shields.io/badge/USD%20MS--AAI-AAI--530%20Final%20Project-002868)
 
-Key insights include:
+<a href="https://colab.research.google.com/github/oxayavongsa/iot-smarthouse-energy/blob/main/Final_Code_G3.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"/></a>
 
-- Data sources: EcoLab Ground and WeatherLink Indoor sensors.
+</div>
 
-- Data preprocessing: Outlier removal, missing value handling, feature engineering.
+## Overview
+Heating and cooling drive a large share of residential energy use. If a home can **anticipate indoor temperature** and **recognize uncomfortable conditions** (humid, dry, unstable) before they happen, HVAC can be scheduled proactively instead of reactively. This project builds that forecasting and classification layer from real IoT sensor streams: EcoLab Ground and WeatherLink Indoor sensors merged into a unified dataset of 100,000+ records (Jun–Nov 2023 modeling window).
 
-Modeling results:
+## 📊 Key Results
+Figures are from the notebook outputs (`Final_Code_G3.ipynb`), the saved metric files in `Data/`, and `Final_Paper_G3.pdf`.
 
-- LSTM achieved a Root Mean Squared Error (RMSE) of 0.81°C.
+| Model | Task | Result |
+|---|---|---|
+| **LSTM** (optimized) | Next-step indoor temp forecast | **RMSE 0.81 °C**, MAE 0.63 °C, MAPE 3.68%, R² 0.68 |
+| **CNN** | 4-class condition classification | **94.5% accuracy**, weighted F1 0.96, precision 0.98 |
+| **SARIMAX** | Exogenous temp forecast (1/6/24 h rolling) | RMSE 1.04 °C, MAE 0.82 °C, R² 0.47 |
 
-- CNN classified indoor conditions with 94% accuracy but struggled with rare classes.
+- LSTM was the strongest forecaster; SARIMAX was competitive at 1-hour horizons but smoothed out detail at 6–24 h.
+- The CNN scored well on common classes (F1 0.96–0.98) but the rare **"unstable"** class (112 of 13,142 test samples) reached only 0.16 precision, so class imbalance is the main open issue.
 
-- SARIMAX performed well for short-term forecasts but declined in long-term accuracy.
+<p align="center">
+  <img src="Visuals/LSTM%20Predictions%20vs%20Actual%20Values.png" width="48%" alt="LSTM predictions vs actual"/>
+  <img src="Visuals/CNN%20Confusion%20Matrix.png" width="40%" alt="CNN confusion matrix"/>
+</p>
+<p align="center">
+  <img src="Visuals/Rolling%20Forecast%20vs%20Actual%201-6-24%20hrs.png" width="80%" alt="SARIMAX rolling forecast 1/6/24 h"/>
+</p>
 
-## Dashboard
-<a href="https://public.tableau.com/views/FinalPredictions/IoTSmartHomeDashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" target="_blank">[View Tableau - Smart Home IoT Dashboard]</a>
+📈 **Interactive dashboard:** [Smart Home IoT Dashboard on Tableau Public](https://public.tableau.com/views/FinalPredictions/IoTSmartHomeDashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link) (PDF snapshot: `Final_Dashboard_G3.pdf`)
 
-The interactive dashboard visualizes key findings, including:
+## 🔧 Approach
+```mermaid
+flowchart LR
+  A[Smart House Data Pack<br/>GlazeAlarm · EcoLab · WeatherLink] --> B[Cleaning<br/>outliers, skewed rH, ffill/bfill]
+  B --> C[Feature engineering<br/>rolling means, barometric deltas]
+  C --> D[Merged dataset<br/>Jun–Nov 2023]
+  D --> E[LSTM<br/>temp forecast]
+  D --> F[CNN<br/>condition classes]
+  D --> G[SARIMAX<br/>exogenous forecast]
+  E & F & G --> H[Metrics + predictions CSV] --> I[Tableau dashboard]
+```
 
-- Time-series analysis of temperature trends from June to November 2023.
+## 🗂️ Dataset
+**Smart House Data Pack (2022–2023)**, Suffolk Sustainability Institute, [Kaggle](https://www.kaggle.com/datasets/ssiatuos/smart-house-data-pack), licensed CC BY-NC 4.0. Cleaned extracts used for modeling are in `Data/` (`EcoLab Ground Cleaned.csv`, `Weather Link Indoor Cleaned.csv`, `Front Door Cleaned.csv`).
 
-- Comparison of predicted vs. actual temperatures using LSTM and SARIMAX.
+## 🧰 Tech Stack
+Python · pandas · NumPy · TensorFlow/Keras · scikit-learn · statsmodels · Matplotlib · Seaborn · Tableau · Google Colab (A100)
 
-- eCO₂ levels and classification results for different environmental conditions.
+## 📁 Repository Structure
+```
+iot-smarthouse-energy/
+├── Data/                    # cleaned sensor CSVs, model metrics & predictions, .keras models
+├── Visuals/                 # EDA, model, and forecast charts
+├── Final_Code_G3.ipynb      # end-to-end notebook (EDA → LSTM / CNN / SARIMAX)
+├── Final_Code_G3.pdf        # notebook export
+├── Final_Paper_G3.pdf       # technical paper
+├── Final_Dashboard_G3.pdf   # Tableau dashboard export
+├── requirement.txt
+└── LICENSE
+```
 
-## Data Files
+## ▶️ How to Run
+```bash
+git clone https://github.com/oxayavongsa/iot-smarthouse-energy.git
+cd iot-smarthouse-energy
+pip install numpy pandas matplotlib seaborn scikit-learn "tensorflow==2.15.0" statsmodels jupyter
+jupyter notebook Final_Code_G3.ipynb
+```
+The full dependency list is in `requirement.txt`. To re-run from raw data, download the Kaggle data pack into `./smart-house-data-pack/` (the notebook's expected path). Or just open it in Colab with the badge above. Pre-trained models (`final_cnn_model.keras`, `lstm_model_optimized.keras`) can be loaded with `tf.keras.models.load_model`.
 
-- The dataset contains cleaned IoT sensor data used for modeling and analysis:
+## 👥 Team
+- **Outhai Xayavongsa (Thai)**, Team Leader
+- **Aaron Ramirez**, Tech Lead
 
-- ```EcoLab Ground Cleaned.csv``` – Cleaned dataset from the EcoLab Ground sensor.
+Course: AAI-530 Data Analytics and the Internet of Things, Prof. Anna Marbut, University of San Diego (M.S. Applied Artificial Intelligence)
 
-- ```Front Door Cleaned.csv``` – Processed data from the Front Door sensor.
+## 📄 License
+Code: Apache License 2.0. Dataset: CC BY-NC 4.0 (non-commercial). See [LICENSE](LICENSE).
 
-- ```Weather Link Indoor Cleaned.csv``` – Indoor environmental sensor data.
-
-- Model predictions
-
-- Model performance metrics
-  
-- Visuals
-
-## Trained Models
-
-The following trained models are included:
-
-- ```final_cnn_model.keras``` – Final trained CNN model.
-
-- ```lstm_model_optimized.keras``` – Optimized LSTM model.
-
-## Codebase <a href="https://colab.research.google.com/github/oxayavongsa/aai-530-iot-smart-house/blob/main/Final_Code_G3.ipynb" target="_blank">
-  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"/>
-</a>
-
-The code repository consists of Python scripts and Jupyter Notebooks for:
-
-- Data preprocessing: Cleaning and feature engineering.
-
-- Modeling: Implementation of LSTM, CNN, and SARIMAX models.
-
-- Evaluation: Performance metrics and comparative analysis.
-
-- Visualization: Graphs and plots illustrating trends and predictions.
-
-## Git Ignore & License
-
-```.gitignore``` specifies ignored files, ensuring version control efficiency.
-
-*```LICENSE``` outlines usage rights, adhering to Apache License 2.0 for software and Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) for dataset use.*
-
-## How to Use
-
-1. Clone the repository:
-
-```git clone https://github.com/oxayavongsa/aai-530-iot-smart-house.git```
-
-2. Install dependencies:
-
-```pip install -r requirements.txt```
-
-3. Run the Jupyter Notebook:
-
-- Open and execute ```Final_Code_G3.ipynb``` in Jupyter or Google Colab.
-
-4. Explore results:
-
-- View predictions and insights in the provided dashboard.
-
-## Key Findings
-
-- LSTM outperformed traditional time-series models in capturing temperature variations.
-  ![image](https://github.com/user-attachments/assets/3f4cf25d-9fba-4846-a1cc-cdd1cac0dc8d)
-
-- CNN effectively classified environmental conditions but required better handling of imbalanced classes.
-
-- SARIMAX provided interpretability but struggled with long-term forecasting.
-
-- Data preprocessing, including smoothing and interpolation, significantly improved model performance.
-
-## Future Enhancements
-
-- Incorporate real-time IoT data streams for live monitoring.
-
-- Explore hybrid models combining CNN and LSTM for enhanced spatial and temporal analysis.
-
-- Improve handling of rare conditions through class balancing techniques.
-
-## Contributors
-
-- Outhai Xayavongsa (Ms. Thai) - Team Leader
-
-- Aaron Ramirez - Tech Lead
-
-## License
-
-- The software is licensed under Apache License 2.0.
-
-- The dataset follows the Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license.
+---
+<div align="center">
+Built by <a href="https://github.com/oxayavongsa">Outhai (Thai) Xayavongsa</a> · <a href="https://oxayavongsa.github.io/ai-automation-portfolio/">Portfolio</a>
+</div>
